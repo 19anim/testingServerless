@@ -14,7 +14,7 @@ const ProductController = {
     try {
       const product = await productModel
         .findById(req.params.id)
-        .populate("categories");
+        .populate(["categories", "description"]);
       res.status(200).json(product);
     } catch (error) {
       res.status(500).json(error);

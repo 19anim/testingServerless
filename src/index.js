@@ -14,11 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(morgan("common"));
 route(app);
-moongose
-  .connect(
-    "mongodb+srv://jagerthejagershopDB:NguyenPhiTuanAn13121910@jagerthejagershop.08pgz.mongodb.net/"
-  )
-  .then(console.log("Connected to DB"));
+moongose.connect(process.env.MONGODB_URL).then(console.log("Connected to DB"));
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

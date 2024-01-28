@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
   },
   description: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "Products Description",
   },
   image: {
     type: String,
