@@ -6,8 +6,8 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   description: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Products Description",
+    type: String,
+    required: true,
   },
   image: {
     type: String,
@@ -25,12 +25,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  categories: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Categories",
-    },
-  ],
+  categories: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Categories",
+  },
   isBestSeller: {
     type: Boolean,
     required: true,
@@ -42,6 +40,9 @@ const productSchema = new mongoose.Schema({
   stock: {
     type: Number,
     required: true,
+  },
+  slug: {
+    type: String,
   },
 });
 

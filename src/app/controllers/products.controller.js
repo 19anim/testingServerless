@@ -1,9 +1,10 @@
 const productModel = require("../../model/product.model");
+const slugify = require("slugify");
 
 const ProductController = {
   getAllProducts: async (req, res) => {
     try {
-      const products = await productModel.find();
+      const products = await productModel.find().populate(["categories"]);
       res.status(200).json(products);
     } catch (error) {
       res.status(500).json(error);
@@ -14,7 +15,7 @@ const ProductController = {
     try {
       const product = await productModel
         .findById(req.params.id)
-        .populate(["categories", "description"]);
+        .populate(["categories"]);
       res.status(200).json(product);
     } catch (error) {
       res.status(500).json(error);
@@ -22,8 +23,10 @@ const ProductController = {
   },
 
   addAProduct: async (req, res) => {
+    const productInforToSave = req.body;
     try {
-      const newProduct = new productModel(req.body);
+      productInforToSave.slug = slugify(productInforToSave.name);
+      const newProduct = new productModel(productInforToSave);
       const savedNewProduct = await newProduct.save();
       res.status(200).json(savedNewProduct);
     } catch (error) {
