@@ -17,6 +17,14 @@ const productsDescriptionController = {
       res.status(500).json(error);
     }
   },
+  getAllDescription: async (req, res) => {
+    try {
+      const products = await productDescriptionModel.find();
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
 };
 
 module.exports = productsDescriptionController;

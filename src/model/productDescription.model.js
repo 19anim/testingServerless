@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const productDescriptionSchema = new mongoose.Schema({
-  product: [
+  products: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Products",
@@ -18,7 +18,7 @@ const productDescriptionSchema = new mongoose.Schema({
 });
 
 const productDescription = mongoose.model(
-  "Products Description",
+  "Product Descriptions",
   productDescriptionSchema
 );
 
