@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   accessToken: {
     type: String,
   },
-  RefreshToken: {
+  refreshToken: {
     type: String,
   },
 });
