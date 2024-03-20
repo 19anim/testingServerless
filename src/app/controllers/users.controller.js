@@ -73,6 +73,9 @@ const userController = {
       } else {
         await userModel.updateOne({ accessToken: accessToken });
       }
+      res.cookie("access_token", accessToken, {
+        httpOnly: true,
+      });
       res.status(200).json({
         message: "Login successfully",
         userName: userInfor.userName,

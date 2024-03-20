@@ -7,11 +7,18 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
 const path = require("path");
 dotenv.config({ path: "./src/.env" });
 
+var corsOptions = {
+  origin: 'http://localhost:5173/',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cookieParser());
 app.use(morgan("common"));
 route(app);
 moongose.connect(process.env.MONGODB_URL).then(console.log("Connected to DB"));
