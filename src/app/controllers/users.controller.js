@@ -3,9 +3,8 @@ const roleModel = require("../../model/role.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const suid = require("rand-token").suid;
-const dotenv = require("dotenv");
-dotenv.config({ path: "./src/.env" });
 const SALT_ROUNDS = 10;
+const accessTokenUtil = require("../../utils/accessToken.utils");
 
 const userController = {
   addUser: async (req, res) => {
@@ -17,11 +16,13 @@ const userController = {
       if (isUserExist) {
         res.status(409).json("This user is existed");
       } else {
+        let refreshToken = suid(16);
         const hashPassword = bcrypt.hashSync(req.body.password, SALT_ROUNDS);
         const userInforToSave = new userModel({
           email: userInfor.email,
           userName: userInfor.userName,
           password: hashPassword,
+          refreshToken: refreshToken,
         });
         const savedUserInfor = await userInforToSave.save();
         res.status(200).json("User is create successfully");
@@ -49,31 +50,25 @@ const userController = {
       if (!isPasswordValid) {
         return res.status(401).json("Wrong username or password");
       }
+      const refreshToken = userInfor.refreshToken;
       const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
       const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-      const accessToken = jwt.sign(
-        { username: loginInfor.userName },
+      const accessToken = accessTokenUtil.createAccessToken(
+        loginInfor.userName,
         accessTokenSecret,
-        {
-          algorithm: "HS256",
-          expiresIn: accessTokenLife,
-        }
+        accessTokenLife
       );
       if (!accessToken) {
         return res
           .status(401)
           .json("Something went wrong when trying to login, please try again");
       }
-      let refreshToken = suid(16);
-      if (!userInfor.refreshToken) {
-        await userModel.updateOne({
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        });
-      } else {
-        await userModel.updateOne({ accessToken: accessToken });
-      }
       res.cookie("access_token", accessToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
+        httpOnly: true,
+      });
+      res.cookie("refresh_token", refreshToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
         httpOnly: true,
       });
       res.status(200).json({

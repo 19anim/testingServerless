@@ -12,9 +12,10 @@ const path = require("path");
 dotenv.config({ path: "./src/.env" });
 
 var corsOptions = {
-  origin: 'http://localhost:5173/',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+  origin: "http://localhost:5173",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  credentials: true,
+};
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
