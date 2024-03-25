@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const usersController = require("../app/controllers/users.controller");
-const refreshAccessToken = require("../middlewares/refreshToken.middleware");
+const verifyAndRefreshAccessToken = require("../middlewares/verifyAndRefreshToken.middleware");
 
 router.post("/addNewUser", usersController.addUser);
 router.post("/login", usersController.loginUser);
-router.post("/verifyToken", usersController.verifyToken);
+router.get("/logout", usersController.logoutUser);
+router.put("/editUserInformation/:userName", usersController.editUser);
+router.post("/getUserInformation", verifyAndRefreshAccessToken , usersController.getUserInformation);
+router.get("/oAuth", usersController.verifyIsLoggedIn);
 
 module.exports = router;

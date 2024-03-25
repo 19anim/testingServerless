@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const accessTokenUtil = require("../utils/accessToken.utils");
 const userModel = require("../model/user.model");
 
-const refreshAccessToken = async (req, res, next) => {
+const verifyAndRefreshAccessToken = async (req, res, next) => {
   const accessToken = req.cookies.access_token;
   const refreshToken = req.cookies.refresh_token;
   const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
@@ -21,18 +21,19 @@ const refreshAccessToken = async (req, res, next) => {
       ignoreExpiration: true,
     });
 
-    const currentUser = await userModel.findOne({
-      userName: decodedAccessToken.username,
-    });
-    console.log(currentUser.refreshToken);
-    console.log(refreshToken);
-
-    const newAccessToken = accessTokenUtil.createAccessToken(
-      decodedAccessToken.username,
-      accessTokenSecret,
-      accessTokenLife
-    );
-    res.locals.newAccessToken = accessToken;
+    if (decodedAccessToken.exp * 1000 < Date.now()) {
+      const currentUser = await userModel.findOne({
+        userName: decodedAccessToken.username,
+      });
+      if (currentUser) {
+        const newAccessToken = accessTokenUtil.createAccessToken(
+          currentUser.userName,
+          accessTokenSecret,
+          accessTokenLife
+        );
+        res.locals.refreshedAccessToken = newAccessToken;
+      }
+    }
   } catch (error) {
     console.log(error.message);
     return res.status(400).json("Access Token is not valid or expired");
@@ -40,4 +41,4 @@ const refreshAccessToken = async (req, res, next) => {
   next();
 };
 
-module.exports = refreshAccessToken;
+module.exports = verifyAndRefreshAccessToken;

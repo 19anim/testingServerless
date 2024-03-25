@@ -13,6 +13,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  receipentName: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+  phoneNumber: {
+    type: String,
+  },
   roles: [
     {
       type: mongoose.Schema.Types.ObjectId,

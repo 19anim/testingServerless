@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const suid = require("rand-token").suid;
 const SALT_ROUNDS = 10;
 const accessTokenUtil = require("../../utils/accessToken.utils");
+const mongoose = require("mongoose");
+const NORMAL_USER_ROLE = "NORMAL_USER";
 
 const userController = {
   addUser: async (req, res) => {
@@ -18,13 +20,22 @@ const userController = {
       } else {
         let refreshToken = suid(16);
         const hashPassword = bcrypt.hashSync(req.body.password, SALT_ROUNDS);
-        const userInforToSave = new userModel({
+        const role = !req.body.role
+          ? await roleModel.findOne({ role: NORMAL_USER_ROLE })
+          : await roleModel.findOne({ role: req.body.role });
+        const userInforToSave = {
           email: userInfor.email,
           userName: userInfor.userName,
           password: hashPassword,
+          receipentName: "",
+          address: "",
+          phoneNumber: "",
+          roles: [role._id],
           refreshToken: refreshToken,
-        });
-        const savedUserInfor = await userInforToSave.save();
+        };
+        const newUser = new userModel(userInforToSave);
+        const savedUserInfor = await newUser.save();
+        await role.updateOne({ $push: { users: savedUserInfor.id } });
         res.status(200).json("User is create successfully");
       }
     } catch (error) {
@@ -74,6 +85,7 @@ const userController = {
       res.status(200).json({
         message: "Login successfully",
         userName: userInfor.userName,
+        email: userInfor.email,
         accessToken: accessToken,
         refreshToken: userInfor.refreshToken
           ? userInfor.refreshToken
@@ -84,16 +96,91 @@ const userController = {
     }
   },
 
-  verifyToken: async (req, res) => {
+  logoutUser: async (req, res) => {
     try {
-      const verifyResult = jwt.verify(
-        req.body.accessToken,
-        process.env.ACCESS_TOKEN_SECRET
-      );
-      const isExpired = Date.now() >= exp * 1000;
-      res.status(200).json(isExpired);
+      res.clearCookie("access_token");
+      res.clearCookie("refresh_token");
+      res.status(200).json("Logout Successfully");
     } catch (error) {
       res.status(500).json(error);
+    }
+  },
+
+  editUser: async (req, res) => {
+    try {
+      const { phoneNumber, receipentName, address } = req.body;
+      const user = userModel.find({ userName: req.params.userName });
+      const savedNewUser = await user.updateOne({
+        phoneNumber: phoneNumber,
+        receipentName: receipentName,
+        address: address,
+      });
+      console.log("Update Done");
+      res.status(200).json(savedNewUser);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
+  getUserInformation: async (req, res) => {
+    try {
+      if (res.locals.refreshedAccessToken) {
+        res.cookie("access_token", res.locals.refreshedAccessToken, {
+          maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
+          httpOnly: true,
+        });
+      }
+      const userName = req.body.userName;
+      let userInfor = await userModel.findOne({ userName: userName }).lean();
+      if (userInfor) {
+        delete userInfor.password;
+        delete userInfor.roles;
+        delete userInfor.refreshToken;
+        delete userInfor._id;
+        delete userInfor.__v;
+      }
+      return res.status(200).json(userInfor);
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  },
+
+  verifyIsLoggedIn: async (req, res) => {
+    try {
+      if (
+        req.cookies.refresh_token == "" ||
+        req.cookies.refresh_token == undefined ||
+        req.cookies.access_token == undefined ||
+        req.cookies.access_token == ""
+      ) {
+        return res.status(401).json({
+          isLoggedIn: false,
+        });
+      }
+      const userInfor = await userModel
+        .findOne({
+          refreshToken: req.cookies.refresh_token,
+        })
+        .lean();
+      if (userInfor) {
+        delete userInfor.password;
+        delete userInfor.roles;
+        delete userInfor.refreshToken;
+        delete userInfor._id;
+        delete userInfor.__v;
+        return res.status(200).json({
+          isLoggedIn: true,
+          userInfor: userInfor,
+        });
+      } else {
+        return res.status(401).json({
+          isLoggedIn: false,
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        isLoggedIn: false,
+      });
     }
   },
 };
