@@ -29,6 +29,9 @@ const userController = {
           password: hashPassword,
           receipentName: "",
           address: "",
+          ward: "",
+          district: "",
+          city: "",
           phoneNumber: "",
           roles: [role._id],
           refreshToken: refreshToken,
@@ -108,12 +111,30 @@ const userController = {
 
   editUser: async (req, res) => {
     try {
-      const { phoneNumber, receipentName, address } = req.body;
+      if (res.locals.refreshedAccessToken) {
+        res.cookie("access_token", res.locals.refreshedAccessToken, {
+          maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
+          httpOnly: true,
+        });
+      }
+      const {
+        phoneNumber,
+        receipentName,
+        address,
+        ward,
+        district,
+        city,
+        email,
+      } = req.body;
       const user = userModel.find({ userName: req.params.userName });
       const savedNewUser = await user.updateOne({
         phoneNumber: phoneNumber,
         receipentName: receipentName,
+        email: email,
         address: address,
+        ward: ward,
+        district: district,
+        city: city,
       });
       console.log("Update Done");
       res.status(200).json(savedNewUser);

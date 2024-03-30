@@ -6,7 +6,7 @@ const verifyAndRefreshAccessToken = require("../middlewares/verifyAndRefreshToke
 router.post("/addNewUser", usersController.addUser);
 router.post("/login", usersController.loginUser);
 router.get("/logout", usersController.logoutUser);
-router.put("/editUserInformation/:userName", usersController.editUser);
+router.put("/editUserInformation/:userName" , usersController.editUser);
 router.post("/getUserInformation", verifyAndRefreshAccessToken , usersController.getUserInformation);
 router.get("/oAuth", usersController.verifyIsLoggedIn);
 

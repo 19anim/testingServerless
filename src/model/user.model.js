@@ -19,9 +19,24 @@ const UserSchema = new mongoose.Schema({
   address: {
     type: String,
   },
+  ward: {
+    type: String,
+  },
+  district: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
   phoneNumber: {
     type: String,
   },
+  orders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Orders",
+    },
+  ],
   roles: [
     {
       type: mongoose.Schema.Types.ObjectId,
