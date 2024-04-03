@@ -80,10 +80,12 @@ const userController = {
       res.cookie("access_token", accessToken, {
         maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
         httpOnly: true,
+        sameSite: "none",
       });
       res.cookie("refresh_token", refreshToken, {
         maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
         httpOnly: true,
+        sameSite: "none",
       });
       res.status(200).json({
         message: "Login successfully",
@@ -115,6 +117,7 @@ const userController = {
         res.cookie("access_token", res.locals.refreshedAccessToken, {
           maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
           httpOnly: true,
+          sameSite: "none",
         });
       }
       const {
@@ -149,6 +152,7 @@ const userController = {
         res.cookie("access_token", res.locals.refreshedAccessToken, {
           maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
           httpOnly: true,
+          sameSite: "none",
         });
       }
       const userName = req.body.userName;
