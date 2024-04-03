@@ -81,11 +81,13 @@ const userController = {
         maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
         httpOnly: true,
         sameSite: "none",
+        secure: true,
       });
       res.cookie("refresh_token", refreshToken, {
         maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
         httpOnly: true,
         sameSite: "none",
+        secure: true,
       });
       res.status(200).json({
         message: "Login successfully",
@@ -118,6 +120,7 @@ const userController = {
           maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
           httpOnly: true,
           sameSite: "none",
+          secure: true,
         });
       }
       const {
@@ -153,6 +156,7 @@ const userController = {
           maxAge: 1000 * 60 * 60 * 24 * 7, //Cookie expire in 7 days
           httpOnly: true,
           sameSite: "none",
+          secure: true,
         });
       }
       const userName = req.body.userName;
