@@ -1,5 +1,4 @@
 const express = require("express");
-const serverless = require("serverless-http");
 const app = express();
 const port = 3000;
 const route = require("../src/routes/index.route");
@@ -28,5 +27,3 @@ moongose.connect(process.env.MONGODB_URL).then(console.log("Connected to DB"));
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-module.exports.handler = serverless(app);
