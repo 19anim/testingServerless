@@ -160,10 +160,9 @@ const userController = {
         });
       }
       const userName = req.body.userName;
-      let userInfor = await userModel.findOne({ userName: userName }).lean();
+      let userInfor = await userModel.findOne({ userName: userName }).lean().populate("roles");
       if (userInfor) {
         delete userInfor.password;
-        delete userInfor.roles;
         delete userInfor.refreshToken;
         delete userInfor._id;
         delete userInfor.__v;
