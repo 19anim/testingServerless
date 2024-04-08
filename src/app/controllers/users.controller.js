@@ -174,6 +174,8 @@ const userController = {
   },
 
   verifyIsLoggedIn: async (req, res) => {
+    console.log(req.cookies.refresh_token);
+    console.log(req.cookies.access_token);
     try {
       if (
         req.cookies.refresh_token == "" ||
